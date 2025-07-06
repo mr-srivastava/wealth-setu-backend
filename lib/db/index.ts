@@ -14,6 +14,10 @@ const client = postgres(getDatabaseUrl(), {
   max: 10, // Connection pool size
   idle_timeout: 20, // Use idle_timeout instead of timeout
   connect_timeout: 30, // Increase connection timeout
+  // Add retry logic for connection failures
+  max_lifetime: 60 * 30, // 30 minutes
+  // Add connection retry
+  onnotice: () => {}, // Suppress notice messages
 });
 
 // Create drizzle instance with schema

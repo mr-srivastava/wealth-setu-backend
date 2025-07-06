@@ -30,6 +30,12 @@ import {
   validateTransactionsApiResponse
 } from "../validation";
 
+// Check if we're in a build environment
+const isBuildTime = () => {
+  return process.env.NODE_ENV === 'production' && 
+         (process.env.VERCEL_ENV === 'production' || process.env.BUILD_TIME === 'true');
+};
+
 export async function getEntityTypes(): Promise<EntityTypeWithRelations[]> {
   try {
     const data = await getAllEntityTypes();
@@ -79,6 +85,44 @@ export async function getTransactions(): Promise<TransactionsApiResponse> {
 }
 
 export async function getAnalyticsData(): Promise<AnalyticsApiResponse> {
+  // During build time, return empty data to prevent build failures
+  if (isBuildTime()) {
+    console.log("Build time detected, returning empty analytics data");
+    return {
+      entityTypes: [],
+      entities: [],
+      transactions: [],
+      stats: {
+        totalAmount: 0,
+        transactionCount: 0,
+        averageAmount: 0,
+        maxAmount: 0,
+        minAmount: 0
+      },
+      commissionStats: {
+        totalCommissions: 0,
+        currentFinancialYear: {
+          total: 0,
+          percentageChange: 0
+        },
+        currentMonth: {
+          total: 0,
+          percentageChange: 0
+        },
+        monthlyAverage: 0
+      },
+      recentCommissionsData: {
+        transactions: [],
+        grandTotal: {
+          currentFYTotal: 0,
+          previousFYTotal: 0,
+          percentageChange: 0
+        },
+        entityTypeTotals: []
+      }
+    };
+  }
+
   try {
     const [entityTypes, entities, transactionsData] = await Promise.all([
       getEntityTypes(),
