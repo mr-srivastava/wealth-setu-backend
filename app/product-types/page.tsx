@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RefreshCw, AlertCircle, Package, TrendingUp, BarChart3, Building2 } from "lucide-react";
 import { getAnalyticsData } from "@/lib/db/analytics-server";
-import { formatCurrency } from "@/components/analytics/types";
 import type { EntityTypeWithRelations, EntityWithRelations } from "@/lib/db/types";
 
 export default async function ProductTypesPage() {

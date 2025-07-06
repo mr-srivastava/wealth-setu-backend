@@ -104,6 +104,28 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+interface TooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: string | number;
+    name: string;
+    dataKey: string;
+    color?: string;
+    payload: Record<string, unknown>;
+  }>;
+  label?: string;
+  className?: string;
+  indicator?: "line" | "dot" | "dashed";
+  hideLabel?: boolean;
+  hideIndicator?: boolean;
+  labelFormatter?: (value: string | number, payload: Array<Record<string, unknown>>) => React.ReactNode;
+  labelClassName?: string;
+  formatter?: (value: string | number, name: string, props: Record<string, unknown>, index: number, payload: Record<string, unknown>) => React.ReactNode;
+  color?: string;
+  nameKey?: string;
+  labelKey?: string;
+}
+
 function ChartTooltipContent({
   active,
   payload,
@@ -118,14 +140,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
-    hideLabel?: boolean
-    hideIndicator?: boolean
-    indicator?: "line" | "dot" | "dashed"
-    nameKey?: string
-    labelKey?: string
-  }) {
+}: TooltipProps) {
   const { config } = useChart()
 
   const tooltipLabel = React.useMemo(() => {
@@ -144,7 +159,7 @@ function ChartTooltipContent({
     if (labelFormatter) {
       return (
         <div className={cn("font-medium", labelClassName)}>
-          {labelFormatter(value, payload)}
+          {labelFormatter(value as string | number, payload || [])}
         </div>
       )
     }
@@ -250,17 +265,25 @@ function ChartTooltipContent({
 
 const ChartLegend = RechartsPrimitive.Legend
 
+interface LegendProps {
+  className?: string;
+  hideIcon?: boolean;
+  payload?: Array<{
+    value: string;
+    dataKey: string;
+    color?: string;
+  }>;
+  verticalAlign?: "top" | "bottom";
+  nameKey?: string;
+}
+
 function ChartLegendContent({
   className,
   hideIcon = false,
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-    hideIcon?: boolean
-    nameKey?: string
-  }) {
+}: LegendProps) {
   const { config } = useChart()
 
   if (!payload?.length) {

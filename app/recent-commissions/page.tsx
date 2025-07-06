@@ -28,7 +28,7 @@ export default async function RecentCommissionsPage() {
   }));
 
   const recentCommissionsData: RecentCommissionsData = {
-    transactions: transactions as any, // Type assertion needed due to Date vs string mismatch
+    transactions: transactions as unknown as RecentCommissionsData['transactions'], // Type assertion needed due to Date vs string mismatch
     grandTotal: transactionsData.recentCommissionsData.grandTotal,
     entityTypeTotals: transactionsData.recentCommissionsData.entityTypeTotals,
   };
