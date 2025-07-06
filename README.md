@@ -1,105 +1,207 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Wealth Setu Backend
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+A comprehensive wealth management analytics dashboard built with Next.js, Supabase, and Drizzle ORM. This application provides detailed insights into financial transactions, commission tracking, and partner performance analytics.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## 🚀 Features
 
-## Features
+### Analytics Dashboard
+- **Overview Cards**: Key metrics and commission statistics
+- **Recent Commissions**: Latest transaction entries and trends
+- **Partner Analytics**: Performance tracking for different financial partners
+- **Product Type Analysis**: Categorized financial product insights
+- **Performance Metrics**: Monthly trends and growth analysis
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+### Data Management
+- **Entity Management**: Track financial institutions and partners (ICICI, Kotak, etc.)
+- **Transaction Tracking**: Monthly commission and transaction amounts
+- **User Management**: Secure authentication and user profiles
+- **Budget & Goals**: Financial planning and goal tracking
 
-## Demo
+### Technical Features
+- **Real-time Analytics**: Live data updates and insights
+- **Responsive Design**: Mobile-friendly interface with modern UI
+- **Dark/Light Theme**: Theme switching capability
+- **Secure Authentication**: Supabase-based user authentication
+- **Database Migrations**: Automated schema management with Drizzle
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+## 🛠️ Tech Stack
 
-## Deploy to Vercel
+- **Frontend**: Next.js 15 with App Router, React 19, TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **Database**: PostgreSQL with Supabase
+- **ORM**: Drizzle ORM for type-safe database operations
+- **Authentication**: Supabase Auth with SSR support
+- **Charts**: Recharts for data visualization
+- **State Management**: TanStack Query for server state
+- **Validation**: Zod for schema validation
 
-Vercel deployment will guide you through creating a Supabase account and project.
+## 📁 Project Structure
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+```
+wealth-setu-backend/
+├── app/                    # Next.js app router pages
+│   ├── analytics/         # Analytics dashboard pages
+│   ├── api/              # API routes
+│   ├── performance/      # Performance tracking
+│   ├── partners/         # Partner management
+│   ├── reports/          # Reporting features
+│   └── settings/         # User settings
+├── components/           # React components
+│   ├── analytics/        # Analytics-specific components
+│   ├── performance/      # Performance components
+│   └── ui/              # Reusable UI components
+├── lib/                 # Utility libraries
+│   ├── db/             # Database configuration and schemas
+│   ├── hooks/          # Custom React hooks
+│   └── utils/          # Helper functions
+└── scripts/            # Database and data management scripts
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+## 🚀 Getting Started
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### Prerequisites
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+- Node.js 18+ 
+- npm, yarn, or pnpm
+- Supabase account and project
 
-## Clone and run locally
+### Installation
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
-
-2. Create a Next.js app using the Supabase Starter template npx command
-
+1. **Clone the repository**
    ```bash
-   npx create-next-app --example with-supabase with-supabase-app
+   git clone <repository-url>
+   cd wealth-setu-backend
    ```
 
+2. **Install dependencies**
    ```bash
-   yarn create next-app --example with-supabase with-supabase-app
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
    ```
 
+3. **Set up environment variables**
+   
+   Copy `.env.example` to `.env.local` and update the values:
    ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
+   cp .env.example .env.local
+   ```
+   
+   Required environment variables:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   DATABASE_URL=your_database_connection_string
    ```
 
-3. Use `cd` to change into the app's directory
-
+4. **Set up the database**
    ```bash
-   cd with-supabase-app
+   # Generate and run migrations
+   npm run db:generate
+   npm run db:migrate
+   
+   # Or push schema directly (for development)
+   npm run db:push
    ```
 
-4. Rename `.env.example` to `.env.local` and update the following:
-
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
-
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
-
-5. You can now run the Next.js local development server:
-
+5. **Start the development server**
    ```bash
    npm run dev
    ```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+   The application will be available at [http://localhost:3000](http://localhost:3000)
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+## 📊 Database Schema
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+The application uses the following main tables:
 
-## Feedback and issues
+- **users**: User authentication and profiles
+- **entities**: Financial institutions and partners
+- **entity_types**: Categories of financial entities
+- **entity_transactions**: Monthly transaction amounts
+- **transactions**: General transaction records
+- **budgets**: Budget planning data
+- **goals**: Financial goal tracking
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+## 🔧 Available Scripts
 
-## More Supabase examples
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production (includes database migration)
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run db:generate` - Generate database migrations
+- `npm run db:migrate` - Run database migrations
+- `npm run db:push` - Push schema changes directly
+- `npm run db:studio` - Open Drizzle Studio
+- `npm run db:check` - Check database schema
+- `npm run db:drop` - Drop database schema
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## 📈 Data Import
+
+The project includes scripts for importing financial data:
+
+- `scripts/import-financial-data.ts` - Import data from CSV files
+- `scripts/check-current-data.ts` - Verify imported data
+- `scripts/fix-commission-amounts.ts` - Data correction utilities
+
+## 🎨 UI Components
+
+Built with shadcn/ui components including:
+- Cards, Tables, and Charts
+- Navigation and Sidebar
+- Forms and Inputs
+- Alerts and Notifications
+- Theme switching
+
+## 🔐 Authentication
+
+Uses Supabase Auth with:
+- Password-based authentication
+- Session management with cookies
+- Protected routes
+- User profile management
+
+## 📱 Responsive Design
+
+The application is fully responsive and works on:
+- Desktop computers
+- Tablets
+- Mobile devices
+
+## 🚀 Deployment
+
+### Vercel Deployment
+
+1. Connect your repository to Vercel
+2. Set up environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+### Manual Deployment
+
+1. Build the application:
+   ```bash
+   npm run build
+   ```
+
+2. Start the production server:
+   ```bash
+   npm run start
+   ```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🆘 Support
+
+For support and questions, please contact the development team or create an issue in the repository.
