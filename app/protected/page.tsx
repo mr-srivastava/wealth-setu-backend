@@ -1,36 +1,47 @@
-import { redirect } from "next/navigation";
+import { AnalyticsDashboardServer } from "@/components/analytics-dashboard";
+import { getAnalyticsData } from "@/lib/db/analytics-server";
+import type { 
+  AnalyticsApiResponse, 
+  DateConverted
+} from "@/lib/db/types";
+import { isDate, isObject, isArray } from "@/lib/db/types";
 
-import { createClient } from "@/lib/supabase/server";
-import { InfoIcon } from "lucide-react";
-import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
+// Inline the prop type here using the database types
+type AnalyticsDashboardServerProps = DateConverted<AnalyticsApiResponse>;
+
+function convertDates<T>(obj: T): DateConverted<T> {
+  if (isArray(obj)) {
+    return obj.map(convertDates) as DateConverted<T>;
+  } else if (isObject(obj)) {
+    const newObj: Record<string, unknown> = {};
+    for (const key in obj) {
+      const value = obj[key];
+      if (isDate(value)) {
+        newObj[key] = value.toISOString();
+      } else {
+        newObj[key] = convertDates(value);
+      }
+    }
+    return newObj as DateConverted<T>;
+  }
+  return obj as DateConverted<T>;
+}
 
 export default async function ProtectedPage() {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    redirect("/auth/login");
-  }
-
+  const data = await getAnalyticsData();
+  const dataWithStringDates = convertDates(data);
+  
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
-      <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          This is a protected page that you can only see as an authenticated
-          user
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+          <p className="text-muted-foreground">
+            Welcome! Here&apos;s your commission analytics overview.
+          </p>
         </div>
       </div>
-      <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          {JSON.stringify(data.user, null, 2)}
-        </pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
-      </div>
+      <AnalyticsDashboardServer {...(dataWithStringDates as AnalyticsDashboardServerProps)} />
     </div>
   );
 }
