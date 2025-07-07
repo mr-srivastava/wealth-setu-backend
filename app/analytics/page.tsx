@@ -2,83 +2,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RefreshCw, AlertCircle, BarChart3, PieChart, TrendingUp, DollarSign, Building2, Package } from "lucide-react";
-import { getAnalyticsData } from "@/lib/db/analytics-server";
+import { getAnalyticsData, isEmptyAnalyticsData } from "@/lib/db/analytics-server";
 import { formatCurrency } from "@/components/analytics/types";
-
-// Define types that match the actual database return values
-interface EntityType {
-  id: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface Entity {
-  entity: {
-    id: string;
-    name: string;
-    typeId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  entityType: {
-    id: string;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-}
-
-interface EntityTransaction {
-  transaction: {
-    id: string;
-    entityId: string;
-    month: string;
-    amount: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  entity: {
-    id: string;
-    name: string;
-    typeId: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-  entityType: {
-    id: string;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
-}
-
-interface CommissionStats {
-  totalCommissions: number;
-  currentFinancialYear: {
-    total: number;
-    percentageChange: number;
-  };
-  currentMonth: {
-    total: number;
-    percentageChange: number;
-  };
-  monthlyAverage: number;
-}
+import { AnalyticsDashboardClient } from "@/components/analytics-dashboard";
+import type { AnalyticsApiResponse, EntityType, EntityWithRelations, EntityTransactionWithRelations, CommissionStats } from "@/lib/db/types";
 
 export default async function AnalyticsPage() {
   let entityTypesData: EntityType[] = [];
-  let entitiesData: Entity[] = [];
-  let transactionsData: EntityTransaction[] = [];
+  let entitiesData: EntityWithRelations[] = [];
+  let transactionsData: EntityTransactionWithRelations[] = [];
   let commissionStats: CommissionStats | null = null;
   let error: string | null = null;
+  let data: AnalyticsApiResponse | null = null;
 
   try {
-    const data = await getAnalyticsData();
+    data = await getAnalyticsData();
     entityTypesData = data.entityTypes || [];
     entitiesData = data.entities || [];
     transactionsData = data.transactions || [];
-    commissionStats = data.commissionStats as CommissionStats | null;
+    commissionStats = data.commissionStats || null;
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to load data";
   }
@@ -96,6 +38,11 @@ export default async function AnalyticsPage() {
         </div>
       </div>
     );
+  }
+
+  // If data is empty (build-time), fetch on client
+  if (data && isEmptyAnalyticsData(data)) {
+    return <AnalyticsDashboardClient />;
   }
 
   // Calculate analytics metrics

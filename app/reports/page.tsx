@@ -2,17 +2,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RefreshCw, AlertCircle, Download, FileText, Calendar, TrendingUp, BarChart3, PieChart } from "lucide-react";
-import { getAnalyticsData } from "@/lib/db/analytics-server";
+import { getAnalyticsData, isEmptyAnalyticsData } from "@/lib/db/analytics-server";
 import { formatCurrency } from "@/components/analytics/types";
-import type { EntityWithRelations, EntityTransactionWithRelations } from "@/lib/db/types";
+import type { AnalyticsApiResponse, EntityWithRelations, EntityTransactionWithRelations } from "@/lib/db/types";
+import { AnalyticsDashboardClient } from "@/components/analytics-dashboard";
 
 export default async function ReportsPage() {
   let entitiesData: EntityWithRelations[] = [];
   let transactionsData: EntityTransactionWithRelations[] = [];
   let error: string | null = null;
+  let data: AnalyticsApiResponse | null = null;
 
   try {
-    const data = await getAnalyticsData();
+    data = await getAnalyticsData();
     entitiesData = data.entities || [];
     transactionsData = data.transactions || [];
   } catch (err) {
@@ -32,6 +34,11 @@ export default async function ReportsPage() {
         </div>
       </div>
     );
+  }
+
+  // If data is empty (build-time), fetch on client
+  if (data && isEmptyAnalyticsData(data)) {
+    return <AnalyticsDashboardClient />;
   }
 
   const reports = [

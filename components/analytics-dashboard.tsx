@@ -3,7 +3,9 @@ import { Separator } from "@/components/ui/separator";
 import { AlertCircle } from "lucide-react";
 import { OverviewCards } from "./analytics/overview-cards";
 import { RecentCommissionsTable } from "./analytics/recent-commissions-table";
-import { TransactionStats, CommissionStats, RecentCommissionsData, EntityType, Entity, EntityTransaction } from "./analytics/types";
+import { TransactionStats, CommissionStats, RecentCommissionsData, EntityType, Entity, EntityTransaction } from "./analytics/types"; 
+import { useQuery } from '@tanstack/react-query';
+import { AnalyticsApiResponse } from "@/lib/db/schemas";
 
 interface AnalyticsDashboardServerProps {
   entityTypes: EntityType[];
@@ -52,4 +54,28 @@ export function AnalyticsDashboardServer({
       </div>
     </div>
   );
+}
+
+export function AnalyticsDashboardClient() {
+  const { data, isLoading, error } = useQuery<AnalyticsApiResponse | undefined>({
+    queryKey: ['analytics-data'],
+    queryFn: async () => {
+      const res = await fetch('/api/analytics/entities');
+      if (!res.ok) throw new Error('Failed to fetch analytics data');
+      const json = await res.json();
+      return json.data;
+    },
+  });
+
+  if (isLoading) {
+    return <div className="text-center py-10">Loading analytics data...</div>;
+  }
+  if (error) {
+    return <div className="text-center py-10 text-red-500">{(error as Error).message}</div>;
+  }
+  if (!data || typeof data !== 'object') {
+    return <div className="text-center py-10">No analytics data available.</div>;
+  }
+  // Reuse the server dashboard for rendering
+  return <AnalyticsDashboardServer {...data} />;
 } 

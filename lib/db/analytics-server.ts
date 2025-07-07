@@ -184,4 +184,16 @@ export async function getTransactionsByCustomPeriodData(period: 'month' | 'quart
     console.error(`Error fetching transactions for ${period} with custom date:`, error);
     throw new Error(`Error fetching transactions for ${period} with custom date`);
   }
+}
+
+// Utility: Detect if analytics data is placeholder/empty (from build)
+export function isEmptyAnalyticsData(data: AnalyticsApiResponse): boolean {
+  return (
+    data.entityTypes.length === 0 &&
+    data.entities.length === 0 &&
+    data.transactions.length === 0 &&
+    data.stats.totalAmount === 0 &&
+    data.stats.transactionCount === 0 &&
+    data.commissionStats.totalCommissions === 0
+  );
 } 
