@@ -24,6 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { NewTransactionSheet } from "@/components/analytics/new-transaction-sheet";
 
 const navigation = [
   {
@@ -115,7 +116,8 @@ export function AnalyticsSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="p-4">
+        <div className="p-4 flex flex-col gap-4">
+          <NewTransactionSheet />
           <div className="text-xs text-muted-foreground space-y-1">
             <p className="font-medium text-foreground">Wealth Setu</p>
             <p>Financial Analytics Platform</p>

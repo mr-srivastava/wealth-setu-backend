@@ -1,25 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getEntities } from "@/lib/db/analytics-server";
+import { getAnalyticsData } from "@/lib/db/analytics-server";
 import { validateCreateEntity } from "@/lib/validation";
 import { createEntity } from "@/lib/db/utils";
 import { z } from "zod";
 
 export async function GET() {
   try {
-    const entities = await getEntities();
-    
+    const analyticsData = await getAnalyticsData();
     return NextResponse.json({
       success: true,
-      data: entities,
-      message: "Entities retrieved successfully"
+      data: analyticsData,
+      message: "Analytics data retrieved successfully"
     });
   } catch (error) {
-    console.error("Error fetching entities:", error);
-    
+    console.error("Error fetching analytics data:", error);
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch entities",
+        error: "Failed to fetch analytics data",
         message: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }

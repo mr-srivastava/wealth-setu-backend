@@ -68,7 +68,8 @@ export default function PerformanceDashboard({ initialData }: PerformanceDashboa
   const formatDateRange = (startDate: string | Date, endDate: string | Date) => {
     const start = typeof startDate === 'string' ? new Date(startDate) : startDate;
     const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
-    return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+    const formatOpts = { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' } as const;
+    return `${start.toLocaleDateString('en-GB', formatOpts)} - ${end.toLocaleDateString('en-GB', formatOpts)}`;
   };
 
   const transactions = data?.transactions || [];

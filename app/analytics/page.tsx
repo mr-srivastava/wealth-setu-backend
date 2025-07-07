@@ -5,24 +5,33 @@ import { RefreshCw, AlertCircle, BarChart3, PieChart, TrendingUp, DollarSign, Bu
 import { getAnalyticsData, isEmptyAnalyticsData } from "@/lib/db/analytics-server";
 import { formatCurrency } from "@/components/analytics/types";
 import { AnalyticsDashboardClient } from "@/components/analytics-dashboard";
-import type { AnalyticsApiResponse, EntityType, EntityWithRelations, EntityTransactionWithRelations, CommissionStats } from "@/lib/db/types";
+import type { EntityType, EntityWithRelations, EntityTransactionWithRelations, CommissionStats } from "@/lib/db/types";
 
 export default async function AnalyticsPage() {
   let entityTypesData: EntityType[] = [];
   let entitiesData: EntityWithRelations[] = [];
   let transactionsData: EntityTransactionWithRelations[] = [];
   let commissionStats: CommissionStats | null = null;
+  let data = null;
   let error: string | null = null;
-  let data: AnalyticsApiResponse | null = null;
+
+  // Timeout utility
+  async function fetchWithTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Timeout")), ms)
+    );
+    return Promise.race([promise, timeout]);
+  }
 
   try {
-    data = await getAnalyticsData();
+    data = await fetchWithTimeout(getAnalyticsData(), 5000); // 5s timeout
     entityTypesData = data.entityTypes || [];
     entitiesData = data.entities || [];
     transactionsData = data.transactions || [];
     commissionStats = data.commissionStats || null;
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to load data";
+    data = null;
   }
 
   if (error) {
@@ -40,8 +49,8 @@ export default async function AnalyticsPage() {
     );
   }
 
-  // If data is empty (build-time), fetch on client
-  if (data && isEmptyAnalyticsData(data)) {
+  // If data is empty (build-time or timeout), fetch on client
+  if (!data || isEmptyAnalyticsData(data)) {
     return <AnalyticsDashboardClient />;
   }
 

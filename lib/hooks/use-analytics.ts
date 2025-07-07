@@ -15,7 +15,16 @@ const fetchEntities = async (): Promise<Entity[]> => {
   if (!response.ok) {
     throw new Error('Failed to fetch entities');
   }
-  return response.json();
+  const json = await response.json();
+  // If the response has a 'data' property with 'entities', return that
+  if (json && json.data && Array.isArray(json.data.entities)) {
+    return json.data.entities;
+  }
+  // fallback: if the response is already an array
+  if (Array.isArray(json)) {
+    return json;
+  }
+  return [];
 };
 
 const fetchTransactions = async (): Promise<{
