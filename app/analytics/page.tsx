@@ -2,9 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RefreshCw, AlertCircle, BarChart3, PieChart, TrendingUp, DollarSign, Building2, Package } from "lucide-react";
-import { getAnalyticsData, isEmptyAnalyticsData } from "@/lib/db/analytics-server";
+import { getAnalyticsData } from "@/lib/db/analytics-server";
 import { formatCurrency } from "@/components/analytics/types";
-import { AnalyticsDashboardClient } from "@/components/analytics-dashboard";
 import type { EntityType, EntityWithRelations, EntityTransactionWithRelations, CommissionStats } from "@/lib/db/types";
 
 export default async function AnalyticsPage() {
@@ -48,12 +47,6 @@ export default async function AnalyticsPage() {
       </div>
     );
   }
-
-  // If data is empty (build-time or timeout), fetch on client
-  if (!data || isEmptyAnalyticsData(data)) {
-    return <AnalyticsDashboardClient />;
-  }
-
   // Calculate analytics metrics
   const totalCommissions = transactionsData.reduce((sum, t) => sum + parseFloat(t.transaction.amount), 0);
   const totalPartners = entitiesData.length;
@@ -298,8 +291,8 @@ export default async function AnalyticsPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Current FY vs Previous FY</span>
                       <span className={`text-sm font-medium ${commissionStats.currentFinancialYear.percentageChange >= 0
-                          ? 'text-green-600'
-                          : 'text-red-600'
+                        ? 'text-green-600'
+                        : 'text-red-600'
                         }`}>
                         {commissionStats.currentFinancialYear.percentageChange >= 0 ? '+' : ''}
                         {commissionStats.currentFinancialYear.percentageChange.toFixed(1)}%
@@ -308,8 +301,8 @@ export default async function AnalyticsPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Current Month vs Previous Month</span>
                       <span className={`text-sm font-medium ${commissionStats.currentMonth.percentageChange >= 0
-                          ? 'text-green-600'
-                          : 'text-red-600'
+                        ? 'text-green-600'
+                        : 'text-red-600'
                         }`}>
                         {commissionStats.currentMonth.percentageChange >= 0 ? '+' : ''}
                         {commissionStats.currentMonth.percentageChange.toFixed(1)}%

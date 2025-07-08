@@ -1,5 +1,5 @@
 import { AnalyticsDashboardServer, AnalyticsDashboardClient } from "@/components/analytics-dashboard";
-import { getAnalyticsData, isEmptyAnalyticsData } from "@/lib/db/analytics-server";
+import { getLandingPageAnalytics } from "@/lib/db/analytics-server";
 
 // Force dynamic rendering to prevent build-time database queries
 export const dynamic = 'force-dynamic';
@@ -8,9 +8,9 @@ export default async function HomePage() {
   let data;
   
   try {
-    data = await getAnalyticsData();
+    data = await getLandingPageAnalytics();
   } catch (error) {
-    console.error("Error fetching analytics data:", error);
+    console.error("Error fetching landing page analytics data:", error);
     // Return a loading state or error state instead of failing the build
     return (
       <div className="flex min-h-screen flex-col items-center justify-center py-2">
@@ -24,8 +24,7 @@ export default async function HomePage() {
     );
   }
 
-  // If data is empty (build-time), fetch on client
-  if (isEmptyAnalyticsData(data)) {
+  if (!data) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center py-2">
         <div className="flex-1 w-full max-w-5xl px-3 py-10">
@@ -35,6 +34,7 @@ export default async function HomePage() {
     );
   }
   
+  // TODO: Update AnalyticsDashboardServer to use the new optimized analytics fields
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <div className="flex-1 w-full max-w-5xl px-3 py-10">

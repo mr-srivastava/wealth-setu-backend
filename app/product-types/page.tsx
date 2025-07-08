@@ -3,9 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RefreshCw, AlertCircle, Package, TrendingUp, BarChart3, Building2 } from "lucide-react";
-import { getAnalyticsData, isEmptyAnalyticsData } from "@/lib/db/analytics-server";
+import { getAnalyticsData } from "@/lib/db/analytics-server";
 import type { AnalyticsApiResponse, EntityTypeWithRelations, EntityWithRelations } from "@/lib/db/types";
-import { AnalyticsDashboardClient } from "@/components/analytics-dashboard";
 
 export default async function ProductTypesPage() {
   let entityTypes: EntityTypeWithRelations[] = [];
@@ -34,11 +33,6 @@ export default async function ProductTypesPage() {
         </div>
       </div>
     );
-  }
-
-  // If data is empty (build-time), fetch on client
-  if (data && isEmptyAnalyticsData(data)) {
-    return <AnalyticsDashboardClient />;
   }
 
   // Calculate summary stats

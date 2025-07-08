@@ -1,23 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAnalyticsData } from "@/lib/db/analytics-server";
+import { getLandingPageAnalytics } from "@/lib/db/analytics-server";
 import { validateCreateEntity } from "@/lib/validation";
 import { createEntity } from "@/lib/db/utils";
 import { z } from "zod";
 
 export async function GET() {
   try {
-    const analyticsData = await getAnalyticsData();
+    const analyticsData = await getLandingPageAnalytics();
     return NextResponse.json({
       success: true,
       data: analyticsData,
-      message: "Analytics data retrieved successfully"
+      message: "Landing page analytics data retrieved successfully"
     });
   } catch (error) {
-    console.error("Error fetching analytics data:", error);
+    console.error("Error fetching landing page analytics data:", error);
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch analytics data",
+        error: "Failed to fetch landing page analytics data",
         message: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }

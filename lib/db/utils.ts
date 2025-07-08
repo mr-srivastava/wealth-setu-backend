@@ -840,3 +840,92 @@ export async function getTransactionsByCustomPeriod(period: 'month' | 'quarter' 
     )
     .orderBy(desc(entityTransactions.month));
 } 
+
+export async function getLandingPageSummaryStats() {
+  // Total commissions, partners, product types, avg per transaction
+  const [commissionResult, partnersResult, typesResult, countResult] = await Promise.all([
+    db.select({ total: sql`COALESCE(SUM(${entityTransactions.amount}), 0)` }).from(entityTransactions),
+    db.select({ count: sql`COUNT(*)` }).from(entities),
+    db.select({ count: sql`COUNT(*)` }).from(entityTypes),
+    db.select({ count: sql`COUNT(*)` }).from(entityTransactions)
+  ]);
+  const totalCommissions = parseFloat(commissionResult[0]?.total as string ?? '0');
+  const totalPartners = parseInt(partnersResult[0]?.count as string ?? '0');
+  const totalProductTypes = parseInt(typesResult[0]?.count as string ?? '0');
+  const transactionCount = parseInt(countResult[0]?.count as string ?? '0');
+  const avgCommissionPerTransaction = transactionCount > 0 ? totalCommissions / transactionCount : 0;
+  return { totalCommissions, totalPartners, totalProductTypes, avgCommissionPerTransaction };
+}
+
+export async function getMonthlyCommissionTrend() {
+  // Last 12 months commission totals in ascending order (oldest to newest)
+  const result = await db.select({
+    month: sql`DATE_TRUNC('month', ${entityTransactions.month})`,
+    total: sql`SUM(${entityTransactions.amount})`
+  })
+    .from(entityTransactions)
+    .groupBy(sql`DATE_TRUNC('month', ${entityTransactions.month})`)
+    .orderBy(sql`DATE_TRUNC('month', ${entityTransactions.month}) DESC`)
+    .limit(12);
+  // Reverse to get ascending order (oldest to newest)
+  return result.reverse().map(r => ({ month: r.month as string, total: parseFloat(r.total as string) }));
+}
+
+export async function getTopPartnersByCommission(limit = 5) {
+  // Top N partners by total commission
+  const result = await db.select({
+    id: entities.id,
+    name: entities.name,
+    totalCommission: sql`SUM(${entityTransactions.amount})`
+  })
+    .from(entityTransactions)
+    .innerJoin(entities, eq(entityTransactions.entityId, entities.id))
+    .groupBy(entities.id, entities.name)
+    .orderBy(sql`SUM(${entityTransactions.amount}) DESC`)
+    .limit(limit);
+  return result.map(r => ({ id: r.id, name: r.name, totalCommission: parseFloat(r.totalCommission as string) }));
+}
+
+export async function getRecentEntityTransactions(limit = 10) {
+  // Most recent N entity transactions (with entity info)
+  const result = await db.select({
+    id: entityTransactions.id,
+    entityId: entityTransactions.entityId,
+    month: entityTransactions.month,
+    amount: entityTransactions.amount,
+    createdAt: entityTransactions.createdAt,
+    entityName: entities.name,
+    entityTypeId: entities.typeId
+  })
+    .from(entityTransactions)
+    .innerJoin(entities, eq(entityTransactions.entityId, entities.id))
+    .orderBy(entityTransactions.month)
+    .limit(limit);
+  return result;
+} 
+
+export async function getPartnerGrowthByMonth() {
+  // Number of new partners added per month (last 12 months)
+  const result = await db.select({
+    month: sql`DATE_TRUNC('month', ${entities.createdAt})`,
+    newPartners: sql`COUNT(*)`
+  })
+    .from(entities)
+    .groupBy(sql`DATE_TRUNC('month', ${entities.createdAt})`)
+    .orderBy(sql`DATE_TRUNC('month', ${entities.createdAt}) ASC`)
+    .limit(12);
+  return result.map(r => ({ month: r.month, newPartners: parseInt(r.newPartners as string) }));
+}
+
+export async function getProductTypeGrowthByMonth() {
+  // Number of new product types added per month (last 12 months)
+  const result = await db.select({
+    month: sql`DATE_TRUNC('month', ${entityTypes.createdAt})`,
+    newTypes: sql`COUNT(*)`
+  })
+    .from(entityTypes)
+    .groupBy(sql`DATE_TRUNC('month', ${entityTypes.createdAt})`)
+    .orderBy(sql`DATE_TRUNC('month', ${entityTypes.createdAt}) ASC`)
+    .limit(12);
+  return result.map(r => ({ month: r.month, newTypes: parseInt(r.newTypes as string) }));
+} 

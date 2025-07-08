@@ -2,10 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { RefreshCw, AlertCircle, Download, FileText, Calendar, TrendingUp, BarChart3, PieChart } from "lucide-react";
-import { getAnalyticsData, isEmptyAnalyticsData } from "@/lib/db/analytics-server";
+import { getAnalyticsData } from "@/lib/db/analytics-server";
 import { formatCurrency } from "@/components/analytics/types";
 import type { AnalyticsApiResponse, EntityWithRelations, EntityTransactionWithRelations } from "@/lib/db/types";
-import { AnalyticsDashboardClient } from "@/components/analytics-dashboard";
 
 export default async function ReportsPage() {
   let entitiesData: EntityWithRelations[] = [];
@@ -34,11 +33,6 @@ export default async function ReportsPage() {
         </div>
       </div>
     );
-  }
-
-  // If data is empty (build-time), fetch on client
-  if (data && isEmptyAnalyticsData(data)) {
-    return <AnalyticsDashboardClient />;
   }
 
   const reports = [
@@ -164,7 +158,7 @@ export default async function ReportsPage() {
               <h2 className="text-xl font-semibold">Available Reports</h2>
               <p className="text-muted-foreground">Select a report to generate and export</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {reports.map((report) => {
                 const Icon = report.icon;
@@ -200,7 +194,7 @@ export default async function ReportsPage() {
               <h2 className="text-xl font-semibold">Report Categories</h2>
               <p className="text-muted-foreground">Browse reports by category</p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {['Summary', 'Performance', 'Analysis', 'Trends', 'Comparison', 'Detailed'].map((category) => {
                 const categoryReports = reports.filter(r => r.category === category);

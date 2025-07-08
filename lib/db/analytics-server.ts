@@ -1,24 +1,28 @@
-import { 
-  getAllEntityTypes, 
-  getAllEntities, 
-  getAllEntityTransactions, 
-  getEntityTransactionStats, 
-  getCommissionStats, 
+import {
+  getAllEntityTypes,
+  getAllEntities,
+  getAllEntityTransactions,
+  getEntityTransactionStats,
+  getCommissionStats,
   getRecentCommissionsData,
   getCommissionStatsByPeriod,
   getTransactionsByPeriod,
   getCommissionStatsByCustomPeriod,
-  getTransactionsByCustomPeriod
+  getTransactionsByCustomPeriod,
+  getRecentEntityTransactions,
+  getTopPartnersByCommission,
+  getMonthlyCommissionTrend,
+  getLandingPageSummaryStats,
 } from "./utils";
-import type { 
-  EntityTypeWithRelations, 
-  EntityWithRelations, 
+import type {
+  EntityTypeWithRelations,
+  EntityWithRelations,
   EntityTransactionWithRelations,
   AnalyticsApiResponse,
   TransactionsApiResponse,
   CommissionStatsByPeriod
 } from "./types";
-import { 
+import {
   validateEntityTypeArray,
   validateEntityArray,
   validateEntityTransactionArray,
@@ -29,12 +33,6 @@ import {
   validateAnalyticsApiResponse,
   validateTransactionsApiResponse
 } from "../validation";
-
-// Check if we're in a build environment
-const isBuildTime = () => {
-  return process.env.NODE_ENV === 'production' && 
-         (process.env.VERCEL_ENV === 'production' || process.env.BUILD_TIME === 'true');
-};
 
 export async function getEntityTypes(): Promise<EntityTypeWithRelations[]> {
   try {
@@ -85,43 +83,6 @@ export async function getTransactions(): Promise<TransactionsApiResponse> {
 }
 
 export async function getAnalyticsData(): Promise<AnalyticsApiResponse> {
-  // During build time, return empty data to prevent build failures
-  if (isBuildTime()) {
-    console.log("Build time detected, returning empty analytics data");
-    return {
-      entityTypes: [],
-      entities: [],
-      transactions: [],
-      stats: {
-        totalAmount: 0,
-        transactionCount: 0,
-        averageAmount: 0,
-        maxAmount: 0,
-        minAmount: 0
-      },
-      commissionStats: {
-        totalCommissions: 0,
-        currentFinancialYear: {
-          total: 0,
-          percentageChange: 0
-        },
-        currentMonth: {
-          total: 0,
-          percentageChange: 0
-        },
-        monthlyAverage: 0
-      },
-      recentCommissionsData: {
-        transactions: [],
-        grandTotal: {
-          currentFYTotal: 0,
-          previousFYTotal: 0,
-          percentageChange: 0
-        },
-        entityTypeTotals: []
-      }
-    };
-  }
 
   try {
     const [entityTypes, entities, transactionsData] = await Promise.all([
@@ -186,7 +147,6 @@ export async function getTransactionsByCustomPeriodData(period: 'month' | 'quart
   }
 }
 
-// Utility: Detect if analytics data is placeholder/empty (from build)
 export function isEmptyAnalyticsData(data: AnalyticsApiResponse): boolean {
   return (
     data.entityTypes.length === 0 &&
@@ -196,4 +156,32 @@ export function isEmptyAnalyticsData(data: AnalyticsApiResponse): boolean {
     data.stats.transactionCount === 0 &&
     data.commissionStats.totalCommissions === 0
   );
+}
+
+// Optimized analytics for landing page
+export async function getLandingPageAnalytics() {
+  try {
+    // Fetch summary stats in parallel
+    const [
+      summaryStats,
+      monthlyTrend,
+      topPartners,
+      recentTransactions,
+    ] = await Promise.all([
+      getLandingPageSummaryStats(),
+      getMonthlyCommissionTrend(),
+      getTopPartnersByCommission(5),
+      getRecentEntityTransactions(10),
+    ]);
+
+    return {
+      summaryStats,           // { totalCommissions, totalPartners, totalProductTypes, avgCommissionPerTransaction }
+      monthlyTrend,           // [{ month, total }]
+      topPartners,            // [{ id, name, totalCommission }]
+      recentTransactions,     // [{ ...transaction }]
+    };
+  } catch (error) {
+    console.error("Error fetching landing page analytics:", error);
+    throw new Error("Failed to fetch landing page analytics");
+  }
 } 
